@@ -1,4 +1,4 @@
-# Geneurally Checkers
+# Gneurally Checkers
 Checkers and Artificial Intelligence. 'Nuf said.
 
 ## What is this bad boy?
