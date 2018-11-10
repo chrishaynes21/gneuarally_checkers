@@ -12,7 +12,10 @@ class Piece:
         self.king = False
 
     def __repr__(self):
-        return 'R' if self.color == Color.RED else 'B'
+        piece = 'R' if self.color == Color.RED else 'B'
+        if self.king:
+            piece += 'K'
+        return piece
 
     def king_me(self):
         self.king = True
