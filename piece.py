@@ -7,9 +7,10 @@ class Color(Enum):
 
 
 class Piece:
-    def __init__(self, color):
+    def __init__(self, color, initial_position):
         self.color = color
         self.king = False
+        self.position = initial_position
 
     def __repr__(self):
         piece = 'R' if self.color == Color.RED else 'B'
