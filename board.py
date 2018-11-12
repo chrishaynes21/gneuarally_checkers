@@ -43,10 +43,11 @@ class Board:
         piece.position = move[1][move_len - 1][0], move[1][move_len - 1][1]
 
         # Check if any piece needs a king
-        if self.turn == Color.RED and move[1][move_len - 1][0] == 0:
-            self.draught[move[1][move_len - 1][0], move[1][move_len - 1][1]].king_me()
-        elif self.turn == Color.BLACK and move[move_len - 1][0] == 7:
-            self.draught[move[1][move_len - 1][0], move[1][move_len - 1][1]].king_me()
+        if self.turn == Color.RED and piece.position[0] == 0:
+            piece.king_me()
+        elif self.turn == Color.BLACK and piece.position[0] == 7:
+            piece.king_me()
+
 
         # Change turn
         self.turn = Color.RED if self.turn == Color.BLACK else Color.BLACK
@@ -80,8 +81,8 @@ class Board:
             else:
                 if self.draught[new_row, new_col].color != self.turn and self.canBeJumped(position, (new_row, new_col)):
                     search = []
-                    jumps = []
                     jump_position = (new_row + row_mod, new_col + col_mod)
+                    jumps = [jump_position]
                     if not king:
                         search.append(self.checkSpace(jump_position, row_mod, col_mod, recurse=True))
                         search.append(self.checkSpace(jump_position, row_mod, -col_mod, recurse=True))
@@ -93,7 +94,7 @@ class Board:
                     if len(search) > 0:
                         for move in search:
                             if move is not None:
-                                jumps.extend([jump_position, move])
+                                jumps.extend(move)
                         return jumps
                     else:
                         return [jump_position]
@@ -105,15 +106,21 @@ class Board:
     # Only can be run on adjacent opponent pieces
     def canBeJumped(self, attacker, defender):
         if attacker[0] < defender[0]:  # Attacking from top to bottom
-            if attacker[1] < defender[1]:  # Attacking from left to right
-                return self.draught[attacker[0] + 2, attacker[1] + 2] is None
-            else:  # Attacking from right to left
-                return self.draught[attacker[0] + 2, attacker[1] - 2] is None
+            if defender[0] < 7:
+                if attacker[1] < defender[1]:  # Attacking from left to right
+                    return defender[1] < 7 and self.draught[attacker[0] + 2, attacker[1] + 2] is None
+                else:  # Attacking from right to left
+                    return defender[1] > 0 and self.draught[attacker[0] + 2, attacker[1] - 2] is None
+            else:
+                return False
         else:  # Attacking from bottom to top
-            if attacker[1] < defender[1]:  # Attacking from left to right
-                return self.draught[attacker[0] - 2, attacker[1] + 2] is None
-            else:  # Attacking from right to left
-                return self.draught[attacker[0] - 2, attacker[1] - 2] is None
+            if defender[0] > 0:
+                if attacker[1] < defender[1]:  # Attacking from left to right
+                    return defender[1] < 7 and self.draught[attacker[0] - 2, attacker[1] + 2] is None
+                else:  # Attacking from right to left
+                    return defender[1] > 0 and self.draught[attacker[0] - 2, attacker[1] - 2] is None
+            else:
+                return False
 
 
 if __name__ == '__main__':
