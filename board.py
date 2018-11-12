@@ -140,6 +140,8 @@ if __name__ == '__main__':
         if decision == 'N' or decision == 'n':
             break
         moves = board.validMoves()
+        if len(moves) == 0:
+            print('Game over, {} won!'.format('Black' if Color.RED == board.turn else 'Red'))
         for i in range(0, len(moves)):
             print('Index:{:3} Move: {}'.format(i, moves[i]))
         move_index = int(input('Move index: '))
