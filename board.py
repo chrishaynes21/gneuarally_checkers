@@ -48,7 +48,6 @@ class Board:
         elif self.turn == Color.BLACK and piece.position[0] == 7:
             piece.king_me()
 
-
         # Change turn
         self.turn = Color.RED if self.turn == Color.BLACK else Color.BLACK
 
@@ -89,7 +88,7 @@ class Board:
                     else:
                         search.append(self.checkSpace(jump_position, row_mod, col_mod, True, True))
                         search.append(self.checkSpace(jump_position, row_mod, -col_mod, True, True))
-                        search.append(self.checkSpace(jump_position, -row_mod, -col_mod, True, True))
+                        search.append(self.checkSpace(jump_position, -row_mod, col_mod, True, True))
                     search = [path for path in search if path is not None]
                     if len(search) > 0:
                         for move in search:
