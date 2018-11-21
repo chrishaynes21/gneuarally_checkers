@@ -22,8 +22,11 @@ class Board:
     def __repr__(self):
         # Formatting for a row
         format_string = '{:2} | {:2} | {:2} | {:2} | {:2} | {:2} | {:2} | {:2}\n'
-        final_string = format_string.format(*list(range(0,8)))
+        final_string = '     ' + format_string.format(*list(range(0,8)))
+        row_count = 0
         for row in self.draught:
+            final_string += ' {} | '.format(row_count)
+            row_count += 1
             final_string += format_string.format(*[str(piece) if piece is not None else '-' for piece in row])
         return final_string
 
