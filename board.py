@@ -33,8 +33,30 @@ class Board:
     def printState(self):
         print(self)
 
+    def numberizeRow(self, row):
+        numericRow =[]
+        for man in row:
+            if man is None:
+                numericRow.append(0)
+            else:
+                numericRow.append(man.to_number())
+        return tuple(numericRow)
+
+    def draughtToVector(self):
+        rows = [self.numberizeRow(row) for row in self.draught]
+        vector = []
+        for row in rows:
+            vector.extend(row)
+        return vector
+
+    def stateMoveVectorForNN(self, move):
+        vector = self.draughtToVector()
+        vector.extend(move[0])
+        vector.extend(move[1][0])
+        return vector
+
     def stateMoveTuple(self, move):
-        return str(self), move
+        return self.draught, move
 
     def makeMove(self, move):
         move_len = len(move[1])
