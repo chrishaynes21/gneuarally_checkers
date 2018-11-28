@@ -10,11 +10,11 @@ class Board:
 
         # Initialize all pieces
         for row_index in range(len(self.draught)):
-            if row_index in [0, 2, 6]:  # Right aligned rows
+            if row_index in [0, 2, 6]:  # Left aligned rows
                 for col_index in [1, 3, 5, 7]:
                     self.draught[row_index, col_index] = Piece(Color.BLACK, (row_index, col_index)) if row_index != 6 \
                         else Piece(Color.RED, (row_index, col_index))
-            elif row_index in [1, 5, 7]:  # Left aligned rows
+            elif row_index in [1, 5, 7]:  # Right aligned rows
                 for col_index in [0, 2, 4, 6]:
                     self.draught[row_index, col_index] = Piece(Color.RED, (row_index, col_index)) if row_index != 1 \
                         else Piece(Color.BLACK, (row_index, col_index))
@@ -31,7 +31,7 @@ class Board:
         print(self)
 
     def stateMoveTuple(self, move):
-        return str(self), move
+        return self.draught, move
 
     def makeMove(self, move):
         move_len = len(move[1])
