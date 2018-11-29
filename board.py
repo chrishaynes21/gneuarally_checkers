@@ -58,6 +58,9 @@ class Board:
     def stateMoveTuple(self, move):
         return self.draught, move
 
+    def setBoard(self, board):
+        self.draught = board
+
     def makeMove(self, move):
         move_len = len(move[1])
         piece = self.draught[move[0][0], move[0][1]]
@@ -102,6 +105,40 @@ class Board:
             # Filter out illegal moves
             valid_moves.extend([(piece.position, move) for move in piece_moves if move is not None])
         return valid_moves
+
+    def isOver(self):
+        origTurn = self.turn
+
+        self.turn = Color.RED
+        redMoves = self.validMoves()
+
+        self.turn = Color.BLACK
+        blackMoves = self.validMoves()
+
+        self.turn = origTurn
+
+        # TODO: handle tie game
+        if len(redMoves) == 0:
+            # RED can't move, BLACK wins
+            return True, Color.BLACK
+        if len(blackMoves) == 0:
+            # BLACK can't move, RED wins
+            return True, Color.RED
+
+        return False, None
+
+    def getUtility(self):
+        isOver, winner = self.isOver()
+
+        if isOver:
+            if winner == Color.RED:
+                return 1 if self.turn is Color.RED else -1
+            if winner == Color.BLACK:
+                return 1 if self.turn is Color.BLACK else -1
+            else:
+                return 0
+
+        return None
 
     # A helper function to check if a space can be moved to. If occupied, it checks if it can begin a jump sequence
     # It returns the valid move for moving in that direction, a list of tuples that represent positions along the way
@@ -158,17 +195,44 @@ class Board:
 
 
 if __name__ == '__main__':
+    # board = Board()
+    # board.printState()
+    # while True:
+    #     decision = input('Turn: {} Continue? Y/N: '.format(board.turn))
+    #     if decision == 'N' or decision == 'n':
+    #         break
+    #     moves = board.validMoves()
+    #     if len(moves) == 0:
+    #         print('Game over, {} won!'.format('Black' if Color.RED == board.turn else 'Red'))
+    #     for i in range(0, len(moves)):
+    #         print('Index:{:3} Move: {}'.format(i, moves[i]))
+    #     move_index = int(input('Move index: '))
+    #     board.makeMove(moves[move_index])
+    #     board.printState()
+
     board = Board()
+    piece = Piece(Color.RED, [1, 1])
+    piece2 = Piece(Color.BLACK, [3, 3])
+    draught = np.empty(shape=(8, 8), dtype=object)
+    draught[1, 1] = piece
+    draught[3, 3] = piece2
+    board.setBoard(draught)
     board.printState()
-    while True:
-        decision = input('Turn: {} Continue? Y/N: '.format(board.turn))
-        if decision == 'N' or decision == 'n':
-            break
-        moves = board.validMoves()
-        if len(moves) == 0:
-            print('Game over, {} won!'.format('Black' if Color.RED == board.turn else 'Red'))
-        for i in range(0, len(moves)):
-            print('Index:{:3} Move: {}'.format(i, moves[i]))
-        move_index = int(input('Move index: '))
-        board.makeMove(moves[move_index])
-        board.printState()
+    assert board.isOver() == (False, None)
+
+    draught[1, 1] = None
+    board.printState()
+    assert board.isOver() == (True, Color.BLACK)
+    board.turn = Color.RED
+    assert board.getUtility() == -1
+    board.turn = Color.BLACK
+    assert board.getUtility() == 1
+
+    draught[1, 1] = piece
+    draught[3, 3] = None
+    board.printState()
+    assert board.isOver() == (True, Color.RED)
+    board.turn = Color.RED
+    assert board.getUtility() == 1
+    board.turn = Color.BLACK
+    assert board.getUtility() == -1
