@@ -22,16 +22,41 @@ class Board:
     def __repr__(self):
         # Formatting for a row
         format_string = '{:2} | {:2} | {:2} | {:2} | {:2} | {:2} | {:2} | {:2}\n'
-        final_string = ''
+        final_string = '     ' + format_string.format(*list(range(0,8)))
+        row_count = 0
         for row in self.draught:
+            final_string += ' {} | '.format(row_count)
+            row_count += 1
             final_string += format_string.format(*[str(piece) if piece is not None else '-' for piece in row])
         return final_string
 
     def printState(self):
         print(self)
 
+    def numberizeRow(self, row):
+        numericRow =[]
+        for man in row:
+            if man is None:
+                numericRow.append(0)
+            else:
+                numericRow.append(man.to_number())
+        return tuple(numericRow)
+
+    def draughtToVector(self):
+        rows = [self.numberizeRow(row) for row in self.draught]
+        vector = []
+        for row in rows:
+            vector.extend(row)
+        return vector
+
+    def stateMoveVectorForNN(self, move):
+        vector = self.draughtToVector()
+        vector.extend(move[0])
+        vector.extend(move[1][0])
+        return vector
+
     def stateMoveTuple(self, move):
-        return str(self), move
+        return self.draught, move
 
     def setBoard(self, board):
         self.draught = board
