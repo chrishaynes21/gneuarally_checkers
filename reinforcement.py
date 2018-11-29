@@ -86,7 +86,7 @@ def useQ(Q, maxSteps):
         states.append(str(board))
 
         if finished(board):
-            print('Black won, read it and weep')
+            print('Red won, read it and weep')
             done = True
         else:
             # Black will take a turn
@@ -95,7 +95,7 @@ def useQ(Q, maxSteps):
             board.makeMove(black_move)
             if finished(board):
                 done = True
-                print('Red won, Chris sucks at programming')
+                print('Black won, Chris sucks at programming')
     return states
 
 
