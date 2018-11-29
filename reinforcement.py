@@ -1,5 +1,5 @@
 from board import Board
-from copy import copy
+from copy import deepcopy
 import random
 import numpy as np
 
@@ -42,7 +42,7 @@ def trainQ(nRepititions, learningRate, epsilonDecayFactor):
 
             # Red will make a move
             move = epsilonGreedy(epsilon, Q, board)
-            board_new = copy(board)
+            board_new = deepcopy(board)
             board_new.makeMove(move)
             if board.stateMoveTuple(move) not in Q:
                 Q[board.stateMoveTuple(move)] = 0
@@ -51,26 +51,26 @@ def trainQ(nRepititions, learningRate, epsilonDecayFactor):
                 # Red has won the checkers match
                 Q[board.stateMoveTuple(move)] = 1
                 done = True
-                outcomes[nGames] = 1
+                outcomes.append(1)
             else:
                 # Black will make a move
-                black_move = np.random.choice(board_new.validMoves())
+                valid_moves = board_new.validMoves()
+                black_move = valid_moves[random.randint(0, len(valid_moves) - 1)]
                 board_new.makeMove(black_move)
                 if finished(board_new):
                     # Red has won
                     Q[board.stateMoveTuple(move)] += learningRate * (-1 - Q[board.stateMoveTuple(move)])
                     done = True
-                    outcomes[nGames] = -1
+                    outcomes.append(-1)
             if step > 1:
                 Q[board_old.stateMoveTuple(move_old)] += \
                     learningRate * (Q[board.stateMoveTuple(move)] - Q[board_old.stateMoveTuple(move_old)])
-
-            board_old, move_old = board, move
+            board_old, move_old = deepcopy(board), move
             board = board_new
     return Q, outcomes
 
 
-def testQ(Q, maxSteps):
+def useQ(Q, maxSteps):
     states = []
     done = False
     board = Board()
@@ -80,7 +80,8 @@ def testQ(Q, maxSteps):
         step += 1
 
         # Red will make a move
-        move = greedy(board.validMoves(), Q, board)
+        valid_moves = board.validMoves()
+        move = greedy(valid_moves, Q, board)
         board.makeMove(move)
         states.append(str(board))
 
@@ -89,7 +90,8 @@ def testQ(Q, maxSteps):
             done = True
         else:
             # Black will take a turn
-            black_move = np.random.choice(board.validMoves())
+            valid_moves = board.validMoves()
+            black_move = valid_moves[random.randint(0, len(valid_moves) - 1)]
             board.makeMove(black_move)
             if finished(board):
                 done = True
@@ -98,6 +100,7 @@ def testQ(Q, maxSteps):
 
 
 if __name__ == '__main__':
-    Q_ret, steps_ret = trainQ(50, 0.5, 0.7)
-    print(steps_ret)
-    steps = testQ(Q_ret, 20)
+    Q_ret, outcomes = trainQ(50, 0.5, 0.7)
+    steps = useQ(Q_ret, 1000)
+    for step in steps:
+        print(step)

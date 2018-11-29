@@ -31,7 +31,7 @@ class Board:
         print(self)
 
     def stateMoveTuple(self, move):
-        return self.draught, move
+        return str(self), move
 
     def makeMove(self, move):
         move_len = len(move[1])
@@ -75,7 +75,7 @@ class Board:
                 piece_moves.append(self.checkSpace(piece.position, -1, -1, king=True))
                 piece_moves.append(self.checkSpace(piece.position, -1, 1, king=True))
             # Filter out illegal moves
-            valid_moves.extend([(piece.position, move) for move in piece_moves if move is not None])
+            valid_moves.extend([(piece.position, tuple(move)) for move in piece_moves if move is not None])
         return valid_moves
 
     # A helper function to check if a space can be moved to. If occupied, it checks if it can begin a jump sequence
