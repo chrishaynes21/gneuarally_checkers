@@ -10,11 +10,11 @@ class Board:
 
         # Initialize all pieces
         for row_index in range(len(self.draught)):
-            if row_index in [0, 2, 6]:  # Right aligned rows
+            if row_index in [0, 2, 6]:  # Left aligned rows
                 for col_index in [1, 3, 5, 7]:
                     self.draught[row_index, col_index] = Piece(Color.BLACK, (row_index, col_index)) if row_index != 6 \
                         else Piece(Color.RED, (row_index, col_index))
-            elif row_index in [1, 5, 7]:  # Left aligned rows
+            elif row_index in [1, 5, 7]:  # Right aligned rows
                 for col_index in [0, 2, 4, 6]:
                     self.draught[row_index, col_index] = Piece(Color.RED, (row_index, col_index)) if row_index != 1 \
                         else Piece(Color.BLACK, (row_index, col_index))
@@ -61,7 +61,7 @@ class Board:
     def setBoard(self, board):
         self.draught = board
 
-    def makeMove(self, move):
+    def makeMove(self, move, change_turn=True):
         move_len = len(move[1])
         piece = self.draught[move[0][0], move[0][1]]
 
@@ -82,7 +82,11 @@ class Board:
         elif self.turn == Color.BLACK and piece.position[0] == 7:
             piece.king_me()
 
-        # Change turn
+        # Change turn if told to
+        if change_turn:
+            self.change_turn()
+
+    def change_turn(self):
         self.turn = Color.RED if self.turn == Color.BLACK else Color.BLACK
 
     def validMoves(self):
@@ -103,7 +107,7 @@ class Board:
                 piece_moves.append(self.checkSpace(piece.position, -1, -1, king=True))
                 piece_moves.append(self.checkSpace(piece.position, -1, 1, king=True))
             # Filter out illegal moves
-            valid_moves.extend([(piece.position, move) for move in piece_moves if move is not None])
+            valid_moves.extend([(piece.position, tuple(move)) for move in piece_moves if move is not None])
         return valid_moves
 
     def isOver(self):
@@ -142,7 +146,9 @@ class Board:
 
     # A helper function to check if a space can be moved to. If occupied, it checks if it can begin a jump sequence
     # It returns the valid move for moving in that direction, a list of tuples that represent positions along the way
-    def checkSpace(self, position, row_mod, col_mod, king=False, recurse=False):
+    def checkSpace(self, position, row_mod, col_mod, king=False, recurse=False, positions=None):
+        if positions is None:
+            positions = []
         new_row = position[0] + row_mod
         new_col = position[1] + col_mod
         # Bounds check the new space (does not include bounds checks for a jump)
@@ -150,28 +156,30 @@ class Board:
             if self.draught[new_row, new_col] is None:  # If the space is not occupied
                 if not recurse:  # If recursion, do not allow for a space to be unoccupied, it must be a jump
                     return [(new_row, new_col)]
-            else:
+                else:
+                    return positions
+            elif position not in positions:
                 # If a space can be jumped, search for another possible jump. The jumps MUST be made if a jump is started
                 if self.draught[new_row, new_col].color != self.turn and self.canBeJumped(position, (new_row, new_col)):
                     search = []  # Holds moves from search, populated with results of searching a new move
                     jump_position = (new_row + row_mod, new_col + col_mod)
-                    jumps = [jump_position]  # Initialize array with first legal jump
+                    positions.extend([tuple(jump_position)])  # Initialize array with first legal jump
                     if not king:  # Since normal pieces can only attack forward, check left and right of the new space
-                        search.append(self.checkSpace(jump_position, row_mod, col_mod, recurse=True))
-                        search.append(self.checkSpace(jump_position, row_mod, -col_mod, recurse=True))
+                        search.append(self.checkSpace(jump_position, row_mod, col_mod, recurse=True, positions=positions))
+                        search.append(self.checkSpace(jump_position, row_mod, -col_mod, recurse=True, positions=positions))
                     else:  # King's can attack backwards, but cannot jump a space twice, thus (-row, -col) is omitted
-                        search.append(self.checkSpace(jump_position, row_mod, col_mod, king=True, recurse=True))
-                        search.append(self.checkSpace(jump_position, row_mod, -col_mod, king=True, recurse=True))
-                        search.append(self.checkSpace(jump_position, -row_mod, col_mod, king=True, recurse=True))
+                        search.append(self.checkSpace(jump_position, row_mod, col_mod, True, True, positions))
+                        search.append(self.checkSpace(jump_position, row_mod, -col_mod, True, True, positions))
+                        search.append(self.checkSpace(jump_position, -row_mod, col_mod, True, True, positions))
                     # Filter out illegal moves and extend the jumps array with valid more valid jumps
                     search = [path for path in search if path is not None]
                     if len(search) > 0:  # Additional jumps exist, add the items to the list using .extend()
                         for move in search:
                             if move is not None:
-                                jumps.extend(move)
-                        return jumps
+                                positions.extend(move)
+                        return positions
                     else:  # No more jumps are possible, so just return this one
-                        return [jump_position]
+                        return positions
         return None
 
     # Only can be run on adjacent opponent pieces
