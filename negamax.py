@@ -9,7 +9,9 @@ inf = float('infinity')
 
 def negamax(board, depthLeft):
     # If at terminal state or depth limit, return utility value and move None
-    if board.isOver() or depthLeft == 0:
+    isOver, _ = board.isOver
+
+    if isOver or depthLeft == 0:
         return board.getUtility(), None
 
     # Find best move and its value from current state

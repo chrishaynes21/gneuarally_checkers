@@ -7,6 +7,7 @@ class Board:
     def __init__(self):
         self.draught = np.empty(shape=(8, 8), dtype=object)
         self.turn = Color.RED
+        self.turnLookAhead = self.turn
 
         # Initialize all pieces
         for row_index in range(len(self.draught)):
@@ -102,16 +103,23 @@ class Board:
 
         return False, None
 
-    def getUtility(self):
+    def getUtility(self, type='nm', maximizePlayer=Color.RED):
         isOver, winner = self.isOver()
 
-        if isOver:
-            if winner == Color.RED:
-                return 1 if self.turn is Color.RED else -1
-            if winner == Color.BLACK:
-                return 1 if self.turn is Color.BLACK else -1
-            else:
-                return 0
+        if type == 'nm':
+            if isOver:
+                if winner == Color.RED:
+                    return 1 if self.turn is Color.RED else -1
+                if winner == Color.BLACK:
+                    return 1 if self.turn is Color.BLACK else -1
+                else:
+                    return 0
+        else: # type == 'mm'
+            if isOver:
+                if maximizePlayer == Color.RED:
+                    return 1 if winner == Color.RED else -1
+                else: # maximizePlayer == Color.BLACK
+                    return 1 if winner == Color.BLACK else -1
 
         return None
 
