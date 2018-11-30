@@ -20,3 +20,9 @@ class Piece:
 
     def king_me(self):
         self.king = True
+
+    def to_number(self):
+        number = 3 if self.king else 1
+        if self.color == Color.BLACK:
+            number *= -1
+        return number
