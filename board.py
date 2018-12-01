@@ -7,7 +7,6 @@ class Board:
     def __init__(self):
         self.draught = np.empty(shape=(8, 8), dtype=object)
         self.turn = Color.RED
-        self.turnLookAhead = self.turn
 
         # Initialize all pieces
         for row_index in range(len(self.draught)):
@@ -150,7 +149,7 @@ class Board:
                 else: # maximizePlayer == Color.BLACK
                     return 1 if winner == Color.BLACK else -1
 
-        return None
+        return 0
 
     # A helper function to check if a space can be moved to. If occupied, it checks if it can begin a jump sequence
     # It returns the valid move for moving in that direction, a list of tuples that represent positions along the way
