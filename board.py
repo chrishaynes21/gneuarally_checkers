@@ -56,7 +56,7 @@ class Board:
         return vector
 
     def stateMoveTuple(self, move):
-        return self.draught, move
+        return str(self), move
 
     def setBoard(self, board):
         self.draught = board
@@ -156,8 +156,6 @@ class Board:
             if self.draught[new_row, new_col] is None:  # If the space is not occupied
                 if not recurse:  # If recursion, do not allow for a space to be unoccupied, it must be a jump
                     return [(new_row, new_col)]
-                else:
-                    return positions
             elif position not in positions:
                 # If a space can be jumped, search for another possible jump. The jumps MUST be made if a jump is started
                 if self.draught[new_row, new_col].color != self.turn and self.canBeJumped(position, (new_row, new_col)):
@@ -175,7 +173,7 @@ class Board:
                     search = [path for path in search if path is not None]
                     if len(search) > 0:  # Additional jumps exist, add the items to the list using .extend()
                         for move in search:
-                            if move is not None:
+                            if move is not None and position not in positions:
                                 positions.extend(move)
                         return positions
                     else:  # No more jumps are possible, so just return this one
