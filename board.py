@@ -131,18 +131,25 @@ class Board:
 
         return False, None
 
-    def getUtility(self):
+    def getUtility(self, type='nm', maximizePlayer=Color.RED):
         isOver, winner = self.isOver()
 
-        if isOver:
-            if winner == Color.RED:
-                return 1 if self.turn is Color.RED else -1
-            if winner == Color.BLACK:
-                return 1 if self.turn is Color.BLACK else -1
-            else:
-                return 0
+        if type == 'nm':
+            if isOver:
+                if winner == Color.RED:
+                    return 1 if self.turn is Color.RED else -1
+                if winner == Color.BLACK:
+                    return 1 if self.turn is Color.BLACK else -1
+                else:
+                    return 0
+        else: # type == 'mm'
+            if isOver:
+                if maximizePlayer == Color.RED:
+                    return 1 if winner == Color.RED else -1
+                else: # maximizePlayer == Color.BLACK
+                    return 1 if winner == Color.BLACK else -1
 
-        return None
+        return 0
 
     # A helper function to check if a space can be moved to. If occupied, it checks if it can begin a jump sequence
     # It returns the valid move for moving in that direction, a list of tuples that represent positions along the way
