@@ -31,9 +31,6 @@ def minimax(board, depthLeft, isMax=True):
             # Make copy of board to make the move on so original board remains the same
             tempBoard = deepcopy(board)
 
-            print("Move: ", move)
-            print("Piece: ", board.draught[move[0][0], move[0][1]])
-
             # Apply a move to current state
             tempBoard.makeMove(move)
 
@@ -43,7 +40,6 @@ def minimax(board, depthLeft, isMax=True):
             if value > bestValue:
                 # Value for this move is better than moves tried so far from this state.
                 bestValue = value
-                #print("new best value max! Old Val: ", bestValue, "New Val: ", value)
                 bestMove = move
 
                 if bestValue == 1:
@@ -68,7 +64,6 @@ def minimax(board, depthLeft, isMax=True):
 
             if value < bestValue:
                 # Value for this move is better than moves tried so far from this state.
-                #print("new best value min! Old Val: ", bestValue, "New Val: ", value)
                 bestValue = value
                 bestMove = move
 
@@ -110,7 +105,7 @@ if __name__ == '__main__':
     draught = np.empty(shape=(8, 8), dtype=object)
     draught[3, 4] = piece
     draught[3, 2] = piece4
-    draught[2, 5] = piece4
+    draught[2, 5] = piece5
     draught[2, 3] = piece2
     draught[0, 3] = piece3
     board.setBoard(draught)
@@ -124,7 +119,26 @@ if __name__ == '__main__':
         if move is None:
             print('move is None. Stopping')
             break
-        board.makeMove(move)
         print("\nPlayer", board.turn, "to", move, "for value", value)
+        board.makeMove(move)
         print(board)
         isMax = not isMax
+        isOver, _ = board.isOver()
+
+    # # Game 3
+    # board = Board()
+    # board.printState()
+    #
+    # isMax = True
+    # isOver, _ = board.isOver()
+    # while not isOver:
+    #     value, move = minimax(board, 10)
+    #     print("move: ", move)
+    #     if move is None:
+    #         print('move is None. Stopping')
+    #         break
+    #     print("\nPlayer", board.turn, "to", move, "for value", value)
+    #     board.makeMove(move)
+    #     print(board)
+    #     isMax = not isMax
+    #     isOver, _ = board.isOver()
