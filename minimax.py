@@ -42,7 +42,7 @@ def minimax(board, depthLeft, isMax=True):
                 bestValue = value
                 bestMove = move
 
-                if bestValue == 1:
+                if bestValue == 2:
                     # victory found, no need to check other states
                     break;
 
@@ -67,7 +67,7 @@ def minimax(board, depthLeft, isMax=True):
                 bestValue = value
                 bestMove = move
 
-                if bestValue == -1:
+                if bestValue == -2:
                     # victory found, no need to check other states
                     break;
 
