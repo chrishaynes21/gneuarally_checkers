@@ -9,7 +9,7 @@ from copy import copy, deepcopy
 
 inf = float('infinity')
 
-def minimax(board, depthLeft, isMax=True):
+def minimax(board, depthLeft, alpha, beta, isMax=True):
 
     isOver, _ = board.isOver()
 
@@ -35,7 +35,7 @@ def minimax(board, depthLeft, isMax=True):
             tempBoard.makeMove(move)
 
             #print('trying max\n',tempBoard)
-            value, _ = minimax(tempBoard, depthLeft - 1, False)
+            value, _ = minimax(tempBoard, depthLeft - 1, alpha, beta, False)
 
             if value > bestValue:
                 # Value for this move is better than moves tried so far from this state.
@@ -45,6 +45,13 @@ def minimax(board, depthLeft, isMax=True):
                 if bestValue == 2:
                     # victory found, no need to check other states
                     break;
+
+            if bestValue > alpha:
+                alpha = bestValue
+
+            if alpha >= beta:
+                #print("pruning alpha: ", alpha, "beta: ", beta)
+                break;
 
         return bestValue, bestMove
 
@@ -60,7 +67,7 @@ def minimax(board, depthLeft, isMax=True):
             tempBoard.makeMove(move)
 
             #print('trying min\n',tempBoard)
-            value, _ = minimax(tempBoard, depthLeft - 1, True)
+            value, _ = minimax(tempBoard, depthLeft - 1, alpha, beta, True)
 
             if value < bestValue:
                 # Value for this move is better than moves tried so far from this state.
@@ -70,6 +77,13 @@ def minimax(board, depthLeft, isMax=True):
                 if bestValue == -2:
                     # victory found, no need to check other states
                     break;
+
+            if bestValue < beta:
+                beta = bestValue
+
+            if beta <= alpha:
+                #print("pruning alpha: ", alpha, "beta: ", beta)
+                break;
 
         return bestValue, bestMove
 
@@ -114,7 +128,7 @@ if __name__ == '__main__':
     isMax = True
     isOver, _ = board.isOver()
     while not isOver:
-        value, move = minimax(board, 5, isMax)
+        value, move = minimax(board, 10, -inf, inf, isMax)
         print("move: ", move)
         if move is None:
             print('move is None. Stopping')
