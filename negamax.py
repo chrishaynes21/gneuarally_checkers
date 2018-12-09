@@ -7,7 +7,7 @@ from copy import copy, deepcopy
 
 inf = float('infinity')
 
-def negamax(board, depthLeft):
+def negamax(board, depthLeft, alpha, beta):
     # If at terminal state or depth limit, return utility value and move None
     isOver, _ = board.isOver()
 
@@ -28,7 +28,7 @@ def negamax(board, depthLeft):
         # print('trying',tempBoard)
         # Use depth-first search to find eventual utility value and back it up.
         #  Negate it because it will come back in context of next player
-        value, _ = negamax(tempBoard, depthLeft - 1)
+        value, _ = negamax(tempBoard, depthLeft - 1, -beta, -alpha)
         value = - value
 
         if value > bestValue:
@@ -36,9 +36,16 @@ def negamax(board, depthLeft):
             bestValue = value
             bestMove = move
 
-            if bestValue == 1:
+            if bestValue == 2:
                 # victory found, no need to check other states
                 break;
+
+        if bestValue > alpha:
+            alpha = bestValue
+
+        if alpha >= beta:
+            #print("pruning alpha: ", alpha, "beta: ", beta)
+            break;
 
     return bestValue, bestMove
 
@@ -80,9 +87,12 @@ if __name__ == '__main__':
     board.setBoard(draught)
     board.printState()
 
+    print("turn: ", board.turn)
+    print("Utility", board.getUtility("nm"))
+
     isOver, _ = board.isOver()
     while not isOver:
-        value, move = negamax(board, 5)
+        value, move = negamax(board, 5, -inf, inf)
         print("move: ", move)
         if move is None:
             print('move is None. Stopping')
@@ -92,18 +102,30 @@ if __name__ == '__main__':
         print(board)
         isOver, _ = board.isOver()
 
-    # # Game 3
-    # board = Board()
-    # board.printState()
-    #
-    # isOver, _ = board.isOver()
-    # while not isOver:
-    #     value, move = negamax(board, 10)
-    #     print("move: ", move)
-    #     if move is None:
-    #         print('move is None. Stopping')
-    #         break
-    #     print("\nPlayer", board.turn, "to", move, "for value", value)
-    #     board.makeMove(move)
-    #     print(board)
-    #     isOver, _ = board.isOver()
+    # Game 3
+    print("-----------------------------------\n"
+          "\n"
+          "\n"
+          "----------N E W  G A M E ----------\n"
+          "\n"
+          "\n"
+          "-----------------------------------\n")
+    board = Board()
+    board.printState()
+
+    isOver, _ = board.isOver()
+    while not isOver:
+        if board.turn == Color.BLACK:
+            move = board.validMoves()[int(len(board.validMoves()) / 2)]
+            print("\nPlayer", board.turn, "to", move)
+            board.makeMove(move)
+        else:
+            value, move = negamax(board, 10, -inf, inf)
+            print("move: ", move)
+            if move is None:
+                print('move is None. Stopping')
+                break
+            print("\nPlayer", board.turn, "to", move, "for value", value)
+            board.makeMove(move)
+        print(board)
+        isOver, _ = board.isOver()
