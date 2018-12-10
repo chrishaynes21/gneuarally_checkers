@@ -146,7 +146,9 @@ def trainQnet(nBatches, nRepsPerBatch, hiddenLayers, nIterations, nReplays, epsi
                 Qnet.train(X, T, nIterations, verbose=False)
 
     print('DONE')
-    return Qnet, outcomes, samples
+    Qnet.outcomes = outcomes
+    Qnet.samples = samples
+    return Qnet
 
 
 # Simulates a game using Q against a random opponent.
