@@ -25,7 +25,7 @@ def finished(board):
     return len(board.validMoves()) == 0
 
 
-def trainQ(nRepititions, learningRate, epsilonDecayFactor):
+def trainQ(nRepititions, learningRate, epsilonDecayFactor, propagationDecayFactor=0.0):
     epsilons = np.zeros(nRepititions)
     epsilon = 1.0
     Q = {}
@@ -38,20 +38,22 @@ def trainQ(nRepititions, learningRate, epsilonDecayFactor):
 
         # Initialize new board
         board = Board()
+        board_move_tuples = []
         done = False
-        while not done:
+        count = 0
+        while not done and count < 1000:
             step += 1
 
             # Red will make a move
             move = epsilonGreedy(epsilon, Q, board)
             board_new = deepcopy(board)
             board_new.makeMove(move)
-            if board.stateMoveTuple(move) not in Q:
-                Q[board.stateMoveTuple(move)] = 0
+            if move not in Q:
+                Q[move] = 0.0
 
             if finished(board_new):
                 # Red has won the checkers match
-                Q[board.stateMoveTuple(move)] = 1
+                Q[move] = 1.0
                 done = True
                 outcomes.append(1)
             else:
@@ -61,15 +63,28 @@ def trainQ(nRepititions, learningRate, epsilonDecayFactor):
                 board_new.makeMove(black_move)
                 if finished(board_new):
                     # Black has won
-                    Q[board.stateMoveTuple(move)] += learningRate * (-1 - Q[board.stateMoveTuple(move)])
+                    Q[move] += (-2.0 - Q[move])
                     done = True
                     outcomes.append(-1)
+            board_move_tuples.append(move)
             if step > 1:
-                Q[board_old.stateMoveTuple(move_old)] += \
-                    learningRate * (Q[board.stateMoveTuple(move)] - Q[board_old.stateMoveTuple(move_old)])
-            board_old, move_old = deepcopy(board), move
+                backPropagateReinforcement(Q, board_move_tuples, learningRate, propagationDecayFactor)
             board = board_new
+            count += 1
     return Q, outcomes
+
+
+def backPropagateReinforcement(Q, move_tuple_list, learningRate, propagationDecayFactor):
+    new_move_tuple = None
+    for move_tuple in reversed(move_tuple_list):
+        if new_move_tuple is None:  # 1st case, already at current value
+            new_move_tuple = move_tuple
+        else:  # All other cases
+            Q[move_tuple] += learningRate * (Q[new_move_tuple] - Q[move_tuple])
+            learningRate *= propagationDecayFactor
+            if learningRate < 0.00000001:
+                break
+            new_move_tuple = move_tuple
 
 
 def useQ(Q, maxSteps):
@@ -102,7 +117,9 @@ def useQ(Q, maxSteps):
 
 
 if __name__ == '__main__':
-    Q_ret, outcomes = trainQ(100, 0.5, 0.7)
+    Q_ret, outcomes = trainQ(100, 0.7, 0.85, 0.2)
+    for move_tuple, value in sorted(Q_ret.items()):
+        print('{} {}'.format(move_tuple, value))
     steps = useQ(Q_ret, 1000)
     for step in steps:
         print(step)
