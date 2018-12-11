@@ -32,6 +32,7 @@ def trainQ(nRepititions, learningRate, epsilonDecayFactor, propagationDecayFacto
     outcomes = []
 
     for nGames in range(nRepititions):
+        print(nGames)
         epsilon *= epsilonDecayFactor
         epsilons[nGames] = epsilon
         step = 0
@@ -47,12 +48,12 @@ def trainQ(nRepititions, learningRate, epsilonDecayFactor, propagationDecayFacto
             move = epsilonGreedy(epsilon, Q, board)
             board_new = deepcopy(board)
             board_new.makeMove(move)
-            if board.stateMoveTuple(move) not in Q:
-                Q[board.stateMoveTuple(move)] = 0.0
+            if move not in Q:
+                Q[move] = 0.0
 
             if finished(board_new):
                 # Red has won the checkers match
-                Q[board.stateMoveTuple(move)] = 1.0
+                Q[move] = 1.0
                 done = True
                 outcomes.append(1)
             else:
@@ -62,17 +63,17 @@ def trainQ(nRepititions, learningRate, epsilonDecayFactor, propagationDecayFacto
                 board_new.makeMove(black_move)
                 if finished(board_new):
                     # Black has won
-                    Q[board.stateMoveTuple(move)] += learningRate * (-1.0 - Q[board.stateMoveTuple(move)])
+                    Q[move] += (-2.0 - Q[move])
                     done = True
                     outcomes.append(-1)
-            board_smts.append(board.stateMoveTuple(move))
+            board_smts.append(move)
             if step > 1:
-                back_propagate_reinforcement(Q, board_smts, learningRate, propagationDecayFactor)
+                backPropagateReinforcement(Q, board_smts, learningRate, propagationDecayFactor)
             board = board_new
     return Q, outcomes
 
 
-def back_propagate_reinforcement(Q, smt_list, learningRate, propagationDecayFactor):
+def backPropagateReinforcement(Q, smt_list, learningRate, propagationDecayFactor):
     new_smt = None
     for smt in reversed(smt_list):
         if new_smt is None:  # 1st case, already at current value
@@ -113,7 +114,7 @@ def useQ(Q, maxSteps):
 
 
 if __name__ == '__main__':
-    Q_ret, outcomes = trainQ(1000, 1, 0.7, 0.9)
+    Q_ret, outcomes = trainQ(100, 0.7, 0.85, 0.2)
     for smt, value in Q_ret.items():
         print('{} {}'.format(smt, value))
     steps = useQ(Q_ret, 1000)
