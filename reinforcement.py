@@ -25,7 +25,7 @@ def finished(board):
     return len(board.validMoves()) == 0
 
 
-def trainQ(nRepititions, learningRate, epsilonDecayFactor, propagationDecayFactor):
+def trainQ(nRepititions, learningRate, epsilonDecayFactor, propagationDecayFactor=0.0):
     epsilons = np.zeros(nRepititions)
     epsilon = 1.0
     Q = {}
@@ -41,7 +41,8 @@ def trainQ(nRepititions, learningRate, epsilonDecayFactor, propagationDecayFacto
         board = Board()
         board_move_tuples = []
         done = False
-        while not done:
+        count = 0
+        while not done and count < 1000:
             step += 1
 
             # Red will make a move
@@ -70,6 +71,7 @@ def trainQ(nRepititions, learningRate, epsilonDecayFactor, propagationDecayFacto
             if step > 1:
                 backPropagateReinforcement(Q, board_move_tuples, learningRate, propagationDecayFactor)
             board = board_new
+            count += 1
     return Q, outcomes
 
 
@@ -81,6 +83,8 @@ def backPropagateReinforcement(Q, move_tuple_list, learningRate, propagationDeca
         else:  # All other cases
             Q[move_tuple] += learningRate * (Q[new_move_tuple] - Q[move_tuple])
             learningRate *= propagationDecayFactor
+            if learningRate < 0.00000001:
+                break
             new_move_tuple = move_tuple
 
 
@@ -115,7 +119,7 @@ def useQ(Q, maxSteps):
 
 if __name__ == '__main__':
     Q_ret, outcomes = trainQ(100, 0.7, 0.85, 0.2)
-    for move_tuple, value in Q_ret.items():
+    for move_tuple, value in sorted(Q_ret.items()):
         print('{} {}'.format(move_tuple, value))
     steps = useQ(Q_ret, 1000)
     for step in steps:

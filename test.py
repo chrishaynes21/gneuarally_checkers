@@ -86,7 +86,7 @@ def randomMoveFunction(state):
 if __name__ == '__main__':
 
     # Train the traditional reinforcement strategy
-    Q_ret, outcomes = trainQ(100, 0.5, 0.7)
+    Q_ret, outcomes = trainQ(100, 0.5, 0.7, 0.2)
     print("Trained traditional Q table")
     # Test the traditional reinforcement strategy against random opponent
     print("Testing Q table against random moves")
