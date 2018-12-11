@@ -32,7 +32,6 @@ def trainQ(nRepititions, learningRate, epsilonDecayFactor, propagationDecayFacto
     outcomes = []
 
     for nGames in range(nRepititions):
-        print(nGames)
         epsilon *= epsilonDecayFactor
         epsilons[nGames] = epsilon
         step = 0
