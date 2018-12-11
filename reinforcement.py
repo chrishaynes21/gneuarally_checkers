@@ -1,7 +1,9 @@
-from board import Board
-from copy import deepcopy
 import random
+from copy import deepcopy
+
 import numpy as np
+
+from board import Board
 
 
 def epsilonGreedy(epsilon, Q, board):
@@ -16,7 +18,7 @@ def epsilonGreedy(epsilon, Q, board):
 
 def greedy(valid_moves, Q, board):
     Qs = np.array([Q.get(board.stateMoveTuple(m), 0) for m in valid_moves])
-    return valid_moves[np.argmin(Qs)]
+    return valid_moves[np.argmax(Qs)]
 
 
 def finished(board):
@@ -58,7 +60,7 @@ def trainQ(nRepititions, learningRate, epsilonDecayFactor):
                 black_move = valid_moves[random.randint(0, len(valid_moves) - 1)]
                 board_new.makeMove(black_move)
                 if finished(board_new):
-                    # Red has won
+                    # Black has won
                     Q[board.stateMoveTuple(move)] += learningRate * (-1 - Q[board.stateMoveTuple(move)])
                     done = True
                     outcomes.append(-1)
@@ -100,7 +102,7 @@ def useQ(Q, maxSteps):
 
 
 if __name__ == '__main__':
-    Q_ret, outcomes = trainQ(50, 0.5, 0.7)
+    Q_ret, outcomes = trainQ(100, 0.5, 0.7)
     steps = useQ(Q_ret, 1000)
     for step in steps:
         print(step)

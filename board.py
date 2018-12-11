@@ -61,7 +61,7 @@ class Board:
     def setBoard(self, board):
         self.draught = board
 
-    def makeMove(self, move, change_turn=True):
+    def makeMove(self, move):
         move_len = len(move[1])
         piece = self.draught[move[0][0], move[0][1]]
 
@@ -82,9 +82,8 @@ class Board:
         elif self.turn == Color.BLACK and piece.position[0] == 7:
             piece.king_me()
 
-        # Change turn if told to
-        if change_turn:
-            self.change_turn()
+        # Change turn
+        self.change_turn()
 
     def change_turn(self):
         self.turn = Color.RED if self.turn == Color.BLACK else Color.BLACK
@@ -121,7 +120,6 @@ class Board:
 
         self.turn = origTurn
 
-        # TODO: handle tie game
         if len(redMoves) == 0:
             # RED can't move, BLACK wins
             return True, Color.BLACK
@@ -221,9 +219,8 @@ class Board:
                         for move in search:
                             if move is not None and position not in positions:
                                 positions.extend(move)
-                        return positions
-                    else:  # No more jumps are possible, so just return this one
-                        return positions
+
+                    return positions
         return None
 
     # Only can be run on adjacent opponent pieces
