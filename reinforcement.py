@@ -39,7 +39,7 @@ def trainQ(nRepititions, learningRate, epsilonDecayFactor, propagationDecayFacto
 
         # Initialize new board
         board = Board()
-        board_smts = []
+        board_move_tuples = []
         done = False
         while not done:
             step += 1
@@ -66,22 +66,22 @@ def trainQ(nRepititions, learningRate, epsilonDecayFactor, propagationDecayFacto
                     Q[move] += (-2.0 - Q[move])
                     done = True
                     outcomes.append(-1)
-            board_smts.append(move)
+            board_move_tuples.append(move)
             if step > 1:
-                backPropagateReinforcement(Q, board_smts, learningRate, propagationDecayFactor)
+                backPropagateReinforcement(Q, board_move_tuples, learningRate, propagationDecayFactor)
             board = board_new
     return Q, outcomes
 
 
-def backPropagateReinforcement(Q, smt_list, learningRate, propagationDecayFactor):
-    new_smt = None
-    for smt in reversed(smt_list):
-        if new_smt is None:  # 1st case, already at current value
-            new_smt = smt
+def backPropagateReinforcement(Q, move_tuple_list, learningRate, propagationDecayFactor):
+    new_move_tuple = None
+    for move_tuple in reversed(move_tuple_list):
+        if new_move_tuple is None:  # 1st case, already at current value
+            new_move_tuple = move_tuple
         else:  # All other cases
-            Q[smt] += learningRate * (Q[new_smt] - Q[smt])
+            Q[move_tuple] += learningRate * (Q[new_move_tuple] - Q[move_tuple])
             learningRate *= propagationDecayFactor
-            new_smt = smt
+            new_move_tuple = move_tuple
 
 
 def useQ(Q, maxSteps):
@@ -115,8 +115,8 @@ def useQ(Q, maxSteps):
 
 if __name__ == '__main__':
     Q_ret, outcomes = trainQ(100, 0.7, 0.85, 0.2)
-    for smt, value in Q_ret.items():
-        print('{} {}'.format(smt, value))
+    for move_tuple, value in Q_ret.items():
+        print('{} {}'.format(move_tuple, value))
     steps = useQ(Q_ret, 1000)
     for step in steps:
         print(step)
