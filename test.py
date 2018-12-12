@@ -10,7 +10,6 @@ import threading as tr
 def finished(state):
     return len(state.validMoves()) == 0
 
-
 def playGame(redMoveFunction, blackMoveFunction, maxSteps, printResult, Q = None):
     states = []
     done = False
@@ -82,6 +81,23 @@ def randomMoveFunction(state):
     valid_moves = state.validMoves()
     random_move = valid_moves[random.randint(0, len(valid_moves) - 1)]
     return random_move
+
+def playOnline(redMoveFunction, Q = None):
+    state = Board()
+    while not finished(state):
+        if Q is not None:
+            move = redMoveFunction(state, Q)
+        else:
+            move = redMoveFunction(state)
+        print(move)
+        state.makeMove(move)
+        print(state)
+        for i in range(len(state.validMoves())):
+            print(str(i) + " " + str(state.validMoves()[i]))
+        move = input("choose a move: ")
+        state.makeMove(state.validMoves()[int(move)])
+        print("moved to state:")
+        print(state)
 
 if __name__ == '__main__':
 
