@@ -32,6 +32,7 @@ def trainQ(nRepititions, learningRate, epsilonDecayFactor, propagationDecayFacto
     outcomes = []
 
     for nGames in range(nRepititions):
+        print(nGames)
         epsilon *= epsilonDecayFactor
         epsilons[nGames] = epsilon
         step = 0
@@ -117,7 +118,7 @@ def useQ(Q, maxSteps):
 
 
 if __name__ == '__main__':
-    Q_ret, outcomes = trainQ(100, 0.7, 0.85, 0.2)
+    Q_ret, outcomes = trainQ(10000, 0.7, 0.85, 0.2)
     for move_tuple, value in sorted(Q_ret.items()):
         print('{} {}'.format(move_tuple, value))
     steps = useQ(Q_ret, 1000)

@@ -200,7 +200,7 @@ class Board:
             if self.draught[new_row, new_col] is None:  # If the space is not occupied
                 if not recurse:  # If recursion, do not allow for a space to be unoccupied, it must be a jump
                     return [(new_row, new_col)]
-            elif (new_row, new_col) not in positions:
+            elif (new_row + row_mod, new_col + col_mod) not in positions:
                 # If a space can be jumped, search for another possible jump. The jumps MUST be made if a jump is started
                 if self.draught[new_row, new_col].color != self.turn and self.canBeJumped(position, (new_row, new_col)):
                     search = []  # Holds moves from search, populated with results of searching a new move
